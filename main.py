@@ -1,7 +1,7 @@
 import sys
 from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QTextEdit, QMessageBox
-from components.editor import Editor
+from components.editor.editor import Editor
 from highlighter import Highlighter
 from models.file import File
 from PyQt6.QtGui import QKeySequence
@@ -21,8 +21,7 @@ class CodeMaster(QMainWindow):
         path = 'D:\Pyprojs\CodeMaster\main.py'
         with open(path, 'r') as f:
             content = f.read()
-            textEdit = Editor(self)
-            file = File(path.split('/')[-1], path, content, textEdit, ctx=self)
+            file = File(path.split('/')[-1], path, content, ctx=self)
             self.files.append(file)
             self.tabWidget.addTab(file.textEdit, file.name)
 
@@ -39,8 +38,7 @@ class CodeMaster(QMainWindow):
         self.editorFont.setPointSize(size)
 
     def newFile(self):
-        textEdit = Editor(self)
-        file = File('Untitled', '', '', textEdit, ctx=self)
+        file = File('Untitled', '', '', ctx=self)
         self.files.append(file)
         self.tabWidget.addTab(file.textEdit, file.name)
 
@@ -69,8 +67,7 @@ class CodeMaster(QMainWindow):
             for path in pathes[0]:
                 with open(path, 'r') as f:
                     content = f.read()
-                    textEdit = Editor(self)
-                    file = File(path.split('/')[-1], path, content, textEdit, ctx=self)
+                    file = File(path.split('/')[-1], path, content, ctx=self)
                     self.files.append(file)
                     self.tabWidget.addTab(file.textEdit, file.name)
 

@@ -1,14 +1,16 @@
 from PyQt6.QtWidgets import QFileDialog
 
+from components.editor.editor import Editor
+
 class File:
-    def __init__(self, name, path, content, textEdit, ctx):
+    def __init__(self, name, path, content, ctx):
         self.path = path
         self.name = name
         self.type = path.split('.')[-1]
         self.ctx = ctx
         self.content = content
-        textEdit.setText(content)
-        self.textEdit = textEdit
+        self.textEdit = Editor(ctx, self.type)
+        self.textEdit.setText(content)
 
     def save(self, isAs=False):
         content = self.textEdit.toPlainText()
