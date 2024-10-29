@@ -2,12 +2,13 @@ from PyQt6.QtWidgets import QTextEdit
 from PyQt6.QtGui import QTextCharFormat, QColor, QFont
 from highlighter import Highlighter
 from components.editor.highlight_configs import highlight_configs
+from PyQt6.QtGui import QKeySequence, QShortcut
 
 def Editor(self, ext):
     editor = QTextEdit(self)
     editor.setFont(self.editorFont)
 
-    config = highlight_configs[ext]
+    config = highlight_configs[ext if ext in highlight_configs else 'py']
     # Functions highlighting
     function_format = QTextCharFormat()
     function_format.setForeground(QColor(0, 111, 159))
@@ -33,8 +34,6 @@ def Editor(self, ext):
         pattern = fr'((^|\s){word}(\s|\t))|\(|\)'
         self.highlighter.add_mapping(pattern, class_format)
 
-    
-
     # Packages highlighting
     function_format = QTextCharFormat()
     function_format.setForeground(QColor(161, 0, 0))
@@ -53,8 +52,6 @@ def Editor(self, ext):
     pattern = config['strings']
     self.highlighter.add_mapping(pattern, import_format)
 
-    
-
     # Comments highlighting
     import_format = QTextCharFormat()
     import_format.setForeground(QColor(129, 129, 129))
@@ -62,6 +59,6 @@ def Editor(self, ext):
     pattern = config['comments']
     self.highlighter.add_mapping(pattern, import_format)
 
-
     self.highlighter.setDocument(editor.document())
+    
     return editor

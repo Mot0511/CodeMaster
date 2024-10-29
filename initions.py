@@ -8,12 +8,16 @@ def initTheme(self):
 def initActions(self):
     self.actionNew.triggered.connect(self.newFile)
     self.actionOpen.triggered.connect(self.openFile)
+    self.actionOpen_folder.triggered.connect(self.openFolder)
     self.actionSave.triggered.connect(self.saveFile)
     self.actionSave_as.triggered.connect(self.saveFileAs)
     self.actionSave_all.triggered.connect(self.saveAll)
     self.actionExit.triggered.connect(self.exit)
     self.actionClose.triggered.connect(self.closeFile)
     self.actionAbout_CodeMaster.triggered.connect(self.about)
+
+    self.actionRun_file.triggered.connect(self.runFile)
+    self.actionConfigure_runner.triggered.connect(self.confRunner)
     
     self.tabWidget.tabCloseRequested.connect(self.closeFile)
 
@@ -22,6 +26,8 @@ def initShortcuts(self):
     newFileSC.activated.connect(self.newFile)
     openFileSC = QShortcut(QKeySequence("Ctrl+O"), self)
     openFileSC.activated.connect(self.openFile)
+    openFolderSC = QShortcut(QKeySequence("Ctrl+Shift+O"), self)
+    openFolderSC.activated.connect(self.openFolder)
     saveFileSC = QShortcut(QKeySequence("Ctrl+S"), self)
     saveFileSC.activated.connect(self.saveFile)
     saveAsFileSC = QShortcut(QKeySequence("Ctrl+Shift+S"), self)
@@ -37,3 +43,6 @@ def initShortcuts(self):
     fontsizeUpSC.activated.connect(self.fontsizeUp)
     fontsizeDownSC = QShortcut(QKeySequence("Ctrl+Minus"), self)
     fontsizeDownSC.activated.connect(self.fontsizeDown)
+
+    enter = QShortcut(QKeySequence("Enter"), self)
+    enter.activated.connect(self.enter)
