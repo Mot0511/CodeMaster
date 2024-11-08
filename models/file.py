@@ -22,5 +22,5 @@ class File:
                 self.name = self.path.split('/')[-1]
 
         if self.path:
-            with open(self.path, 'w') as f:
+            with open(self.path, 'w', encoding='UTF-8') as f:
                 f.write(content)

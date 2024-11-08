@@ -17,6 +17,7 @@ def initActions(self):
     self.actionAbout_CodeMaster.triggered.connect(self.about)
 
     self.actionRun_file.triggered.connect(self.runFile)
+    self.actionRun_project.triggered.connect(self.runProject)
     self.actionConfigure_runner.triggered.connect(self.confRunner)
     
     self.tabWidget.tabCloseRequested.connect(self.closeFile)
@@ -39,10 +40,5 @@ def initShortcuts(self):
     exitFileSC = QShortcut(QKeySequence("Ctrl+Q"), self)
     exitFileSC.activated.connect(self.exit)
 
-    fontsizeUpSC = QShortcut(QKeySequence("Ctrl+Plus"), self)
-    fontsizeUpSC.activated.connect(self.fontsizeUp)
-    fontsizeDownSC = QShortcut(QKeySequence("Ctrl+Minus"), self)
-    fontsizeDownSC.activated.connect(self.fontsizeDown)
-
-    enter = QShortcut(QKeySequence("Enter"), self)
-    enter.activated.connect(self.enter)
+    runProjectSC = QShortcut(QKeySequence("F5"), self)
+    runProjectSC.activated.connect(self.runProject)

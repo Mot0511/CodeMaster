@@ -100,7 +100,7 @@
     </property>
     <addaction name="actionRun_file"/>
     <addaction name="actionRun_project"/>
-    <addaction name="actionConfugure_runner"/>
+    <addaction name="actionConfigure_runner"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuRun"/>
@@ -133,7 +133,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionRun_file"/>
-   <addaction name="actionConfugure_runner"/>
+   <addaction name="actionConfigure_runner"/>
   </widget>
   <action name="actionOpen">
    <property name="icon">
@@ -255,13 +255,13 @@
     <string>Run project</string>
    </property>
   </action>
-  <action name="actionConfugure_runner">
+  <action name="actionConfigure_runner">
    <property name="icon">
     <iconset>
      <normaloff>icons/configurate.png</normaloff>icons/configurate.png</iconset>
    </property>
    <property name="text">
-    <string>Confugure runner</string>
+    <string>Configure runner</string>
    </property>
   </action>
  </widget>

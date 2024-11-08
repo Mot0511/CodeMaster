@@ -2,13 +2,16 @@ import sys
 from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QTextEdit, QMessageBox
 from components.editor.editor import Editor
+from components.runner_configurator.configurator import RunnerConfigurator
 from highlighter import Highlighter
 from models.file import File
 from PyQt6.QtGui import QKeySequence
 from initions import initActions, initShortcuts, initTheme
 import subprocess
+import asyncio
+from multiprocessing import Process
 
-from utils import get_tree_items
+from utils import get_runners, get_tree_items, getMemoryData, setMemoryData
 
 class CodeMaster(QMainWindow):
     def __init__(self):
@@ -23,33 +26,43 @@ class CodeMaster(QMainWindow):
         self.vertSplitter.setStretchFactor(9, 1)
         self.treeView.clicked.connect(self.selectFile)
 
-        path = 'D:\Pyprojs\CodeMaster\\test.py'
-        with open(path, 'r') as f:
-            content = f.read()
-            file = File(path.split('/')[-1], path, content, ctx=self)
-            self.files.append(file)
-            self.tabWidget.addTab(file.textEdit, file.name)
+        memoryData = getMemoryData()
+        for path in memoryData['openedFiles']:
+            self.openFile(path)
+
+        if memoryData['openedFolder']:
+            self.openFolder(memoryData['openedFolder'])
+        
+    def updateOpenedFiles(self):
+        openedFiles = [file.path for file in self.files]
+        setMemoryData('openedFiles', openedFiles)
 
     def runFile(self):
+        self.saveAll()
         index = self.tabWidget.currentIndex()
+        if index == -1: return
         file = self.files[index]
         path = file.path
-        result = subprocess.run(['C:\\Users\\Matvey\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', path], capture_output=True, text=True)              
-        self.output.setText(result.stdout)
+        runners = get_runners()
+        if file.type in runners:
+            runner = runners[file.type]
+            process = subprocess.Popen([runner, path], stdout=subprocess.PIPE)              
+            output, errors = process.communicate()
+            self.output.setText(output.decode('UTF-8'))
+        else:
+            self.confRunner()
+
+    def runProject(self):
+        if hasattr(self, 'folder'):
+            with open(f'{self.folder}/.run_command') as f:
+                run_command = f.read()
+                result = subprocess.run(run_command.split(' '), capture_output=True, text=True)              
+                self.output.setText(result.stdout)
 
     def confRunner(self):
-        pass
-
-    def fontsizeUp(self):
-        print(1)
-        size = self.editorFont.pixelSize()
-        size += 2
-        self.editorFont.setPointSize(size)
-
-    def fontsizeDown(self):
-        size = self.editorFont.pixelSize()
-        size -= 2
-        self.editorFont.setPointSize(size)
+        confWin = RunnerConfigurator(self.folder if hasattr(self, 'folder') else None)
+        confWin.setWindowTitle('Runner configurator')
+        confWin.exec()
 
     def newFile(self):
         file = File('Untitled', '', '', ctx=self)
@@ -76,33 +89,47 @@ class CodeMaster(QMainWindow):
             self.tabWidget.removeTab(index)
             self.files.remove(self.files[index])
 
+            self.updateOpenedFiles()
+
     def selectFile(self, index):
         item = self.treeModel.itemFromIndex(index)
         path = item.path
         if path:
-            with open(path, 'r') as f:
+            with open(path, 'r', encoding='UTF-8') as f:
                 content = f.read()
                 file = File(path.split('\\')[-1], path, content, ctx=self)
                 self.files.append(file) 
                 self.addTab(file.textEdit, file.name)
 
-    def openFile(self):
-        pathes = QFileDialog.getOpenFileNames(self, 'Select file to open', '')
+        self.updateOpenedFiles()
+
+    def openFile(self, path=None):
+        if path:
+            pathes = [[path], True]
+        else:
+            pathes = QFileDialog.getOpenFileNames(self, 'Select file to open', '')
+
         if pathes[1]:
             for path in pathes[0]:
-                with open(path, 'r') as f:
+                with open(path, 'r', encoding='UTF-8') as f:
                     content = f.read()
                     file = File(path.split('/')[-1], path, content, ctx=self)
                     self.files.append(file)
                     self.addTab(file.textEdit, file.name)
 
-    def openFolder(self):
-        path = QFileDialog.getExistingDirectory(self, 'Select folder to open')
+
+        self.updateOpenedFiles()
+
+    def openFolder(self, path=None):
+        path = path if path else QFileDialog.getExistingDirectory(self, 'Select folder to open')
+
         if path:
             self.folder = path
             treeModel = get_tree_items(path, self)
             self.treeModel = treeModel
             self.treeView.setModel(treeModel)
+            setMemoryData('openedFolder', path)
+
 
     def addTab(self, content, title):
         index = self.tabWidget.currentIndex()
@@ -118,10 +145,6 @@ class CodeMaster(QMainWindow):
         msg.setWindowTitle("About CodeMaster")
         msg.setText("CodeMaster is a simple code editor\nAuthor: MatveySuvorov")
         msg.exec()
-
-    def enter(self):
-        editor = self.files[self.tabWidget.currentIndex()].textEdit
-        
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

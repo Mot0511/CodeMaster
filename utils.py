@@ -1,6 +1,21 @@
+import csv
 import os
 from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from PyQt6.QtGui import QColor, QFont
+import json
+
+def setMemoryData(field, value):
+    with open('data/memory.json', 'r') as f:
+        data = json.load(f)
+    data[field] = value
+    with open('data/memory.json', 'w') as f:
+        json.dump(data, f)
+
+def getMemoryData():
+    with open('data/memory.json', 'r') as f:
+        data = json.load(f)
+    
+    return data
 
 class StandardItem(QStandardItem):
     def __init__(self, text='', path='', set_bold=False, color=QColor(0, 0, 0)):
@@ -37,3 +52,16 @@ def get_tree_items(path, self):
     rootNode.appendRow(first_dir)
 
     return treeModel
+
+def get_csv_data(name):
+    with open(f'data/{name}.csv', encoding='UTF-8') as f:
+        reader = csv.reader(f, delimiter=';')
+        return list(reader)
+    
+def get_runners():
+    res = {}
+    data = get_csv_data('runners')
+    for row in data:
+        res[row[0]] = row[1]
+
+    return res
