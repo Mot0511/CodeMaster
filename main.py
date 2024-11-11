@@ -10,6 +10,7 @@ from initions import initActions, initShortcuts, initTheme
 import subprocess
 import asyncio
 from multiprocessing import Process
+import PySide6.QtAsyncio as QtAsyncio
 
 from utils import get_runners, get_tree_items, getMemoryData, setMemoryData
 
@@ -37,7 +38,12 @@ class CodeMaster(QMainWindow):
         openedFiles = [file.path for file in self.files]
         setMemoryData('openedFiles', openedFiles)
 
-    async def runFile(self):
+    async def run_command(runner, path, ctx):
+        process = await asyncio.create_subprocess_shell(f'{runner} {path}', stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        for line in iter(process.stdout.readline, ''):
+            print(line.decode('UTF-8'))
+
+    def runFile(self):
         self.saveAll()
         index = self.tabWidget.currentIndex()
         if index == -1: return
@@ -46,18 +52,7 @@ class CodeMaster(QMainWindow):
         runners = get_runners()
         if file.type in runners:
             runner = runners[file.type]
-            # process = subprocess.Popen([runner, path], stdout=subprocess.PIPE)
-            process = await asyncio.create_subprocess_shell(cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-
-            # stdout, stderr = await proc.communicate()
-
-            # if stdout:
-            #     print(f'[stdout]\n{stdout.decode()}')
-            # output, errors = process.communicate()
-            # self.output.setText(output.decode('UTF-8'))
-            for line in iter(process.stdout.readline, ''):
-                self.output.setText(line.decode('UTF-8'))
-
+            asyncio.ensure_future(self.run_command(runner, path, self))
         else:
             self.confRunner()
 
@@ -155,12 +150,9 @@ class CodeMaster(QMainWindow):
         msg.exec()
 
 
-async def run():
+if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = CodeMaster()
     ex.show()
+    QtAsyncio.run(handle_sigint=True)
     sys.exit(app.exec())
-
-
-if __name__ == '__main__':
-    asyncio.run(run())
