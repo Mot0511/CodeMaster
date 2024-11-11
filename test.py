@@ -1,3 +1,4 @@
-a = 5
-b = 6
-print(a + b - 1)
+import time
+for i in range(5):
+	print(i)
+	time.sleep(1)

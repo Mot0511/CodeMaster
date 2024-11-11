@@ -37,7 +37,7 @@ class CodeMaster(QMainWindow):
         openedFiles = [file.path for file in self.files]
         setMemoryData('openedFiles', openedFiles)
 
-    def runFile(self):
+    async def runFile(self):
         self.saveAll()
         index = self.tabWidget.currentIndex()
         if index == -1: return
@@ -46,9 +46,18 @@ class CodeMaster(QMainWindow):
         runners = get_runners()
         if file.type in runners:
             runner = runners[file.type]
-            process = subprocess.Popen([runner, path], stdout=subprocess.PIPE)              
-            output, errors = process.communicate()
-            self.output.setText(output.decode('UTF-8'))
+            # process = subprocess.Popen([runner, path], stdout=subprocess.PIPE)
+            process = await asyncio.create_subprocess_shell(cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+
+            # stdout, stderr = await proc.communicate()
+
+            # if stdout:
+            #     print(f'[stdout]\n{stdout.decode()}')
+            # output, errors = process.communicate()
+            # self.output.setText(output.decode('UTF-8'))
+            for line in iter(process.stdout.readline, ''):
+                self.output.setText(line.decode('UTF-8'))
+
         else:
             self.confRunner()
 
@@ -84,7 +93,6 @@ class CodeMaster(QMainWindow):
     def closeFile(self, index=None):
         if not index: index = self.tabWidget.currentIndex()
         if not index == -1:
-            print(index)
             self.files[index].save()
             self.tabWidget.removeTab(index)
             self.files.remove(self.files[index])
@@ -146,9 +154,13 @@ class CodeMaster(QMainWindow):
         msg.setText("CodeMaster is a simple code editor\nAuthor: MatveySuvorov")
         msg.exec()
 
-if __name__ == '__main__':
+
+async def run():
     app = QApplication(sys.argv)
     ex = CodeMaster()
     ex.show()
     sys.exit(app.exec())
 
+
+if __name__ == '__main__':
+    asyncio.run(run())
