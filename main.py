@@ -3,6 +3,7 @@ from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QTextEdit, QMessageBox
 from components.editor.editor import Editor
 from components.runner_configurator.configurator import RunnerConfigurator
+from db import getRunners, initDB
 from highlighter import Highlighter
 from models.file import File
 from PyQt6.QtGui import QKeySequence
@@ -11,7 +12,7 @@ import subprocess
 import asyncio
 from multiprocessing import Process
 
-from utils import get_runners, get_tree_items, getMemoryData, setMemoryData
+from utils import get_tree_items, getMemoryData, initData, setMemoryData
 
 class CodeMaster(QMainWindow):
     def __init__(self):
@@ -20,18 +21,19 @@ class CodeMaster(QMainWindow):
         initActions(self)
         initShortcuts(self)
         initTheme(self)
+        initData()
         self.files = []
-        self.highlighter = Highlighter()
         self.horSplitter.setStretchFactor(1, 10)
         self.vertSplitter.setStretchFactor(9, 1)
         self.treeView.clicked.connect(self.selectFile)
 
         memoryData = getMemoryData()
-        for path in memoryData['openedFiles']:
-            self.openFile(path)
+        if memoryData:
+            for path in memoryData['openedFiles']:
+                self.openFile(path)
 
-        if memoryData['openedFolder']:
-            self.openFolder(memoryData['openedFolder'])
+            if memoryData['openedFolder']:
+                self.openFolder(memoryData['openedFolder'])
         
     def updateOpenedFiles(self):
         openedFiles = [file.path for file in self.files]
@@ -43,10 +45,11 @@ class CodeMaster(QMainWindow):
         if index == -1: return
         file = self.files[index]
         path = file.path
-        runners = get_runners()
-        if file.type in runners:
-            runner = runners[file.type]
-            process = subprocess.Popen([runner, path], stdout=subprocess.PIPE)              
+        runners = getRunners()
+        exts = [runner[0] for runner in runners]
+        if file.type in exts:
+            runner = [runner[1] for runner in runners if runner[0] == file.type][0]
+            process = subprocess.Popen([runner, path], stdout=subprocess.PIPE)
             output, errors = process.communicate()
             self.output.setText(output.decode('UTF-8'))
         else:
@@ -71,11 +74,15 @@ class CodeMaster(QMainWindow):
 
     def saveFile(self):
         index = self.tabWidget.currentIndex()
-        if not index == -1: self.files[index].save()
+        if not index == -1: 
+            newName = self.files[index].save()
+            self.tabWidget.setTabText(index, newName)
     
     def saveFileAs(self):
         index = self.tabWidget.currentIndex()
-        if not index == -1: self.files[index].save(isAs=True)
+        if not index == -1: 
+            newName = self.files[index].save(isAs=True)
+            self.tabWidget.setTabText(index, newName)
 
     def saveAll(self):
         for file in self.files:
@@ -84,7 +91,6 @@ class CodeMaster(QMainWindow):
     def closeFile(self, index=None):
         if not index: index = self.tabWidget.currentIndex()
         if not index == -1:
-            print(index)
             self.files[index].save()
             self.tabWidget.removeTab(index)
             self.files.remove(self.files[index])

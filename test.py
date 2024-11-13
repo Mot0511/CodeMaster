@@ -1,3 +1,1 @@
-a = 5
-b = 6
-print(a + b - 1)
+print(1 + 1)

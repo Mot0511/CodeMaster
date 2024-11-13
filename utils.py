@@ -1,21 +1,55 @@
 import csv
 import os
+import sqlite3
 from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from PyQt6.QtGui import QColor, QFont
 import json
+import os
+
+def initData():
+    memory_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Documents', 'CodeMaster')
+    if not os.path.isdir(memory_path):
+        os.mkdir(memory_path)
+        memory_file = os.path.join(memory_path, 'memory.json')
+        if not os.path.exists(memory_file):
+            with open(memory_file, 'w') as f:
+                f.write('{"openedFolder": "","openedFiles": []}')
+            
+        
+        runners_file = os.path.join(memory_path, 'runners.db')
+        if not os.path.exists(runners_file):
+            conn = sqlite3.connect(runners_file)
+            cur = conn.cursor()
+            query = """CREATE TABLE runners 
+                        (
+                        ext VARCHAR(255),
+                        runner VARCHAR(255)
+                        );
+            """
+            cur.execute(query)
+            conn.commit()
+            conn.close()
+            
 
 def setMemoryData(field, value):
-    with open('data/memory.json', 'r') as f:
+    memory_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Documents', 'CodeMaster', 'memory.json')
+    with open(memory_path, 'r') as f:
         data = json.load(f)
+
     data[field] = value
-    with open('data/memory.json', 'w') as f:
+    with open(memory_path, 'w') as f:
         json.dump(data, f)
 
+
 def getMemoryData():
-    with open('data/memory.json', 'r') as f:
-        data = json.load(f)
-    
-    return data
+    memory_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Documents', 'CodeMaster', 'memory.json')
+    try:
+        with open(memory_path, 'r') as f:
+            data = json.load(f)
+        
+        return data
+    except FileNotFoundError:
+        return None
 
 class StandardItem(QStandardItem):
     def __init__(self, text='', path='', set_bold=False, color=QColor(0, 0, 0)):
@@ -52,16 +86,3 @@ def get_tree_items(path, self):
     rootNode.appendRow(first_dir)
 
     return treeModel
-
-def get_csv_data(name):
-    with open(f'data/{name}.csv', encoding='UTF-8') as f:
-        reader = csv.reader(f, delimiter=';')
-        return list(reader)
-    
-def get_runners():
-    res = {}
-    data = get_csv_data('runners')
-    for row in data:
-        res[row[0]] = row[1]
-
-    return res

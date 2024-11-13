@@ -4,11 +4,15 @@ from PyQt6 import uic
 from PyQt6.QtGui import QKeySequence, QShortcut, QFont
 import os
 
+from db import updateRunners, getRunners
+
 class RunnerConfigurator(QDialog):
     def __init__(self, folder):
         super().__init__()
         self.setWindowTitle('Runner configurator')
         uic.loadUi('components/runner_configurator/runner_configurator.ui', self)
+
+        self.runner_file = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Documents', 'CodeMaster', 'runners.json')
         
         self.folder = folder
 
@@ -37,6 +41,8 @@ class RunnerConfigurator(QDialog):
             self.table.setItem(row - 1, 1, QTableWidgetItem(path))
 
             self.table.itemChanged.connect(self.edit_data)
+    
+        self.edit_data()
 
     def init_run_command(self):
         if self.folder and os.path.exists(f'{self.folder}/.run_command'):
@@ -44,22 +50,22 @@ class RunnerConfigurator(QDialog):
                 self.runCommand.setText(f.read())
 
     def init_runners_data(self):
-        with open('data/runners.csv', encoding='UTF-8') as f:
-            reader = csv.reader(f, delimiter=';')
-            for i, row in enumerate(reader):
-                self.table.setRowCount(i + 1)
-                for j, elem in enumerate(row):
-                    self.table.setItem(i, j, QTableWidgetItem(elem))
+        runners = getRunners()
+        for i, row in enumerate(runners):
+            self.table.setRowCount(i + 1)
+            for j, elem in enumerate(row):
+                self.table.setItem(i, j, QTableWidgetItem(elem))
+
+        self.runners = runners
 
     def edit_data(self):
         runners = []
         for i in range(self.table.rowCount()):
             ext = self.table.item(i, 0).text()
             path = self.table.item(i, 1).text()
-            runners.append(f'{ext};{path}')
+            runners.append([ext, path])
 
-        self.for_save = '\n'.join(runners)
-        print(self.for_save)
+        self.runners = runners        
 
     def delete(self):
         row = self.table.currentRow()
@@ -69,9 +75,7 @@ class RunnerConfigurator(QDialog):
         self.edit_data()
 
     def save_data(self):
-        if hasattr(self, 'for_save'):
-            with open('data/runners.csv', 'w') as f:
-                f.write(self.for_save)
+        updateRunners(self.runners)
 
         if self.runCommand.text() and self.folder:
             with open(f'{self.folder}/.run_command', 'w') as f:

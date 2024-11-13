@@ -9,7 +9,12 @@ class File:
         self.type = path.split('.')[-1]
         self.ctx = ctx
         self.content = content
-        self.textEdit = Editor(ctx, self.type)
+
+        editor, highlighter = Editor(ctx, self.type)
+        self.textEdit = editor
+        self.highlighter = highlighter
+
+        self.highlighter.setDocument(self.textEdit.document())
         self.textEdit.setText(content)
 
     def save(self, isAs=False):
@@ -24,3 +29,5 @@ class File:
         if self.path:
             with open(self.path, 'w', encoding='UTF-8') as f:
                 f.write(content)
+                
+                return self.name

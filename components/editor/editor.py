@@ -8,6 +8,7 @@ def Editor(self, ext):
     editor = QTextEdit(self)
     editor.setFont(self.editorFont)
 
+    self.highlighter = Highlighter()
     config = highlight_configs[ext if ext in highlight_configs else 'py']
     # Functions highlighting
     function_format = QTextCharFormat()
@@ -59,6 +60,5 @@ def Editor(self, ext):
     pattern = config['comments']
     self.highlighter.add_mapping(pattern, import_format)
 
-    self.highlighter.setDocument(editor.document())
     
-    return editor
+    return editor, self.highlighter
