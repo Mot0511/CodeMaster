@@ -1,17 +1,13 @@
 import io
 import sys
 from PyQt6 import uic
-from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QTextEdit, QMessageBox
-from components.editor.editor import Editor
+from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from components.runner_configurator.configurator import RunnerConfigurator
-from db import getRunners, initDB
-from highlighter import Highlighter
+from db import getRunners
 from models.file import File
 from PyQt6.QtGui import QIcon
 from initions import initActions, initShortcuts, initTheme
 import subprocess
-import asyncio
-from multiprocessing import Process
 from interface import templete
 from utils import get_tree_items, getMemoryData, initData, setMemoryData
 

@@ -2,7 +2,7 @@ import csv
 from PyQt6.QtWidgets import QDialog, QHeaderView, QFileDialog, QTableWidgetItem, QMessageBox
 import io
 from PyQt6 import uic
-from PyQt6.QtGui import QKeySequence, QShortcut, QFont
+from PyQt6.QtGui import QKeySequence, QShortcut
 import os
 from components.runner_configurator.interface import template
 from db import addRunner, deleteRunner, updateExt, updateRunner, getRunners

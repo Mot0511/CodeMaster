@@ -1,8 +1,7 @@
 from PyQt6.QtWidgets import QTextEdit
-from PyQt6.QtGui import QTextCharFormat, QColor, QFont
+from PyQt6.QtGui import QTextCharFormat, QColor
 from highlighter import Highlighter
 from components.editor.highlight_configs import highlight_configs
-from PyQt6.QtGui import QKeySequence, QShortcut
 
 def Editor(self, ext):
     editor = QTextEdit(self)

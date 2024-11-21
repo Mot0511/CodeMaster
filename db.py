@@ -3,9 +3,6 @@ import os
 
 runners_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Documents', 'CodeMaster', 'runners.db')
 
-def initDB():
-    pass
-
 def getRunners():
     conn = sqlite3.connect(runners_path)
     cur = conn.cursor() 

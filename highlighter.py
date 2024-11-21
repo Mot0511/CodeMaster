@@ -2,7 +2,8 @@ import re
 import sys
 from PyQt6.QtGui import *
 from PyQt6.QtCore import *
-class Highlighter( QSyntaxHighlighter ):
+
+class Highlighter(QSyntaxHighlighter):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._mapping = {}
