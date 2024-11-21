@@ -1,11 +1,11 @@
 import csv
-from PyQt6.QtWidgets import QDialog, QHeaderView, QFileDialog, QTableWidgetItem
+from PyQt6.QtWidgets import QDialog, QHeaderView, QFileDialog, QTableWidgetItem, QMessageBox
 import io
 from PyQt6 import uic
 from PyQt6.QtGui import QKeySequence, QShortcut, QFont
 import os
 from components.runner_configurator.interface import template
-from db import updateRunners, getRunners
+from db import addRunner, deleteRunner, updateExt, updateRunner, getRunners
 
 class RunnerConfigurator(QDialog):
     def __init__(self, folder):
@@ -20,7 +20,7 @@ class RunnerConfigurator(QDialog):
         self.folder = folder
 
         self.table.setColumnCount(2)
-        self.table.setHorizontalHeaderLabels(['Extension of file (without ".")', 'Runner'])
+        self.table.setHorizontalHeaderLabels(['Расширение файла (без ".")', 'Программа для запуска'])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.init_runners_data()
         self.table.itemChanged.connect(self.edit_data)
@@ -35,7 +35,7 @@ class RunnerConfigurator(QDialog):
 
     def select_runner(self):
         self.table.itemChanged.disconnect()
-        path = QFileDialog.getOpenFileName(self, 'Select runner of your language', '')
+        path = QFileDialog.getOpenFileName(self, 'Выберите программу для запуска вашего кода', '')
         if path[1]:
             path = path[0]
             row = self.table.rowCount() + 1
@@ -45,7 +45,7 @@ class RunnerConfigurator(QDialog):
 
             self.table.itemChanged.connect(self.edit_data)
     
-        self.edit_data()
+            addRunner('', path)
 
     def init_run_command(self):
         if self.folder and os.path.exists(f'{self.folder}/.run_command'):
@@ -61,25 +61,38 @@ class RunnerConfigurator(QDialog):
 
         self.runners = runners
 
-    def edit_data(self):
-        runners = []
-        for i in range(self.table.rowCount()):
-            ext = self.table.item(i, 0).text()
-            path = self.table.item(i, 1).text()
-            runners.append([ext, path])
-
-        self.runners = runners        
+    def edit_data(self, item):
+        column = item.column()
+        row = item.row()
+        ext = self.table.item(row, 0)
+        runner = self.table.item(row, 1)
+        if column == 0:
+            updateExt(item.text(), runner.text())
+        else:
+            updateRunner(ext.text(), item.text())
 
     def delete(self):
-        row = self.table.currentRow()
-        if row > -1:
-            self.table.removeRow(row)
+        items = self.table.selectedItems()
+        if not len(items):
+            QMessageBox.information(self, 'Ни одна запись не выбрана', 'Сначала выберите удаляемую программу запуска')
+        else:
+            btn = QMessageBox.question(
+                self,
+                "Ты уверен?",
+                "Ты действительно хочешь удалить программу запуска?"
+            )
 
-        self.edit_data()
-
+            if btn == QMessageBox.StandardButton.Yes:
+                item = items[0]
+                row = item.row()
+                ext = self.table.item(row, 0)
+                runner = self.table.item(row, 1)
+                deleteRunner(ext.text(), runner.text())
+                self.table.removeRow(row)
+            else:
+                pass
+            
     def save_data(self):
-        updateRunners(self.runners)
-
         if self.runCommand.text() and self.folder:
             with open(f'{self.folder}/.run_command', 'w') as f:
                 f.write(self.runCommand.text())

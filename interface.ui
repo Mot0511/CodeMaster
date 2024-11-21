@@ -75,7 +75,7 @@
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>Файл</string>
     </property>
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
@@ -90,13 +90,13 @@
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>Помощь</string>
     </property>
     <addaction name="actionAbout_CodeMaster"/>
    </widget>
    <widget class="QMenu" name="menuRun">
     <property name="title">
-     <string>Run</string>
+     <string>Запуск</string>
     </property>
     <addaction name="actionRun_file"/>
     <addaction name="actionRun_project"/>
@@ -141,7 +141,7 @@
      <normaloff>icons/open_file.png</normaloff>icons/open_file.png</iconset>
    </property>
    <property name="text">
-    <string>Open</string>
+    <string>Открыть</string>
    </property>
   </action>
   <action name="actionSave">
@@ -150,7 +150,7 @@
      <normaloff>icons/save.png</normaloff>icons/save.png</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>Сохранить</string>
    </property>
   </action>
   <action name="actionSave_as">
@@ -159,7 +159,7 @@
      <normaloff>icons/save_as.png</normaloff>icons/save_as.png</iconset>
    </property>
    <property name="text">
-    <string>Save as</string>
+    <string>Сохранить как</string>
    </property>
   </action>
   <action name="actionSave_all">
@@ -168,7 +168,7 @@
      <normaloff>icons/save.png</normaloff>icons/save.png</iconset>
    </property>
    <property name="text">
-    <string>Save all</string>
+    <string>Сохранить все</string>
    </property>
   </action>
   <action name="actionClose">
@@ -177,7 +177,7 @@
      <normaloff>icons/close.png</normaloff>icons/close.png</iconset>
    </property>
    <property name="text">
-    <string>Close</string>
+    <string>Закрыть файл</string>
    </property>
   </action>
   <action name="actionExit">
@@ -186,7 +186,7 @@
      <normaloff>icons/exit.png</normaloff>icons/exit.png</iconset>
    </property>
    <property name="text">
-    <string>Exit</string>
+    <string>Выйти</string>
    </property>
   </action>
   <action name="actionUndo">
@@ -220,7 +220,7 @@
      <normaloff>icons/about.png</normaloff>icons/about.png</iconset>
    </property>
    <property name="text">
-    <string>About CodeMaster</string>
+    <string>О программе</string>
    </property>
   </action>
   <action name="actionNew">
@@ -229,7 +229,7 @@
      <normaloff>icons/new.png</normaloff>icons/new.png</iconset>
    </property>
    <property name="text">
-    <string>New</string>
+    <string>Новый файл</string>
    </property>
   </action>
   <action name="actionOpen_folder">
@@ -238,7 +238,7 @@
      <normaloff>icons/open_folder.png</normaloff>icons/open_folder.png</iconset>
    </property>
    <property name="text">
-    <string>Open folder</string>
+    <string>Открыть папку</string>
    </property>
   </action>
   <action name="actionRun_file">
@@ -247,12 +247,12 @@
      <normaloff>icons/run (2).png</normaloff>icons/run (2).png</iconset>
    </property>
    <property name="text">
-    <string>Run file</string>
+    <string>Запустить файл</string>
    </property>
   </action>
   <action name="actionRun_project">
    <property name="text">
-    <string>Run project</string>
+    <string>Запустить проект</string>
    </property>
   </action>
   <action name="actionConfigure_runner">
@@ -261,7 +261,7 @@
      <normaloff>icons/configurate.png</normaloff>icons/configurate.png</iconset>
    </property>
    <property name="text">
-    <string>Configure runner</string>
+    <string>Конфигурация программ запуска</string>
    </property>
   </action>
  </widget>

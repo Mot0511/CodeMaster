@@ -67,7 +67,6 @@ class CodeMaster(QMainWindow):
 
     def confRunner(self):
         confWin = RunnerConfigurator(self.folder if hasattr(self, 'folder') else None)
-        confWin.setWindowTitle('Runner configurator')
         confWin.exec()
 
     def newFile(self):
@@ -116,7 +115,7 @@ class CodeMaster(QMainWindow):
         if path:
             pathes = [[path], True]
         else:
-            pathes = QFileDialog.getOpenFileNames(self, 'Select file to open', '')
+            pathes = QFileDialog.getOpenFileNames(self, 'Выберите файл для открытия', '')
 
         if pathes[1]:
             for path in pathes[0]:
@@ -130,7 +129,7 @@ class CodeMaster(QMainWindow):
         self.updateOpenedFiles()
 
     def openFolder(self, path=None):
-        path = path if path else QFileDialog.getExistingDirectory(self, 'Select folder to open')
+        path = path if path else QFileDialog.getExistingDirectory(self, 'Выберите папку для открытия')
 
         if path:
             self.folder = path
@@ -151,8 +150,8 @@ class CodeMaster(QMainWindow):
 
     def about(self):
         msg = QMessageBox()
-        msg.setWindowTitle("About CodeMaster")
-        msg.setText("CodeMaster is a simple code editor\nAuthor: MatveySuvorov")
+        msg.setWindowTitle("О программе")
+        msg.setText("CodeMaster - это простой редактор кода\nАвтор: MatveySuvorov")
         msg.exec()
 
 if __name__ == '__main__':

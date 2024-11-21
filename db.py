@@ -15,12 +15,32 @@ def getRunners():
 
     return res
 
-def updateRunners(runners):
+def addRunner(ext, runner):
     conn = sqlite3.connect(runners_path)
     cur = conn.cursor() 
-    cur.execute("DELETE FROM runners")
-    for runner in runners:
-        cur.execute("INSERT INTO runners (ext, runner) VALUES (?, ?)", [runner[0], runner[1]])
+    cur.execute("INSERT INTO runners (ext, runner) VALUES (?, ?)", [ext, runner])
     conn.commit()
+    conn.close()
 
+def updateExt(ext, runner):
+    print(ext)
+    print(runner)
+    conn = sqlite3.connect(runners_path)
+    cur = conn.cursor() 
+    cur.execute(f"UPDATE runners SET ext='{ext}' WHERE runner='{runner}'")
+    conn.commit()
+    conn.close()
+
+def updateRunner(ext, runner):
+    conn = sqlite3.connect(runners_path)
+    cur = conn.cursor() 
+    cur.execute(f"UPDATE runners SET runner='{runner}' WHERE ext='{ext}'")
+    conn.commit()
+    conn.close()
+
+def deleteRunner(ext, runner):
+    conn = sqlite3.connect(runners_path)
+    cur = conn.cursor() 
+    cur.execute(f"DELETE FROM runners WHERE ext='{ext}' AND runner='{runner}'")
+    conn.commit()
     conn.close()
