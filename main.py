@@ -1,3 +1,4 @@
+import io
 import sys
 from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QTextEdit, QMessageBox
@@ -6,18 +7,20 @@ from components.runner_configurator.configurator import RunnerConfigurator
 from db import getRunners, initDB
 from highlighter import Highlighter
 from models.file import File
-from PyQt6.QtGui import QKeySequence
+from PyQt6.QtGui import QIcon
 from initions import initActions, initShortcuts, initTheme
 import subprocess
 import asyncio
 from multiprocessing import Process
-
+from interface import templete
 from utils import get_tree_items, getMemoryData, initData, setMemoryData
+
 
 class CodeMaster(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('interface.ui', self)
+        f = io.StringIO(templete)
+        uic.loadUi(f, self)
         initActions(self)
         initShortcuts(self)
         initTheme(self)
@@ -154,6 +157,7 @@ class CodeMaster(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon('icon.ico'))   
     ex = CodeMaster()
     ex.show()
     sys.exit(app.exec())

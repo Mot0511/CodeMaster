@@ -1,16 +1,19 @@
 import csv
 from PyQt6.QtWidgets import QDialog, QHeaderView, QFileDialog, QTableWidgetItem
+import io
 from PyQt6 import uic
 from PyQt6.QtGui import QKeySequence, QShortcut, QFont
 import os
-
+from components.runner_configurator.interface import template
 from db import updateRunners, getRunners
 
 class RunnerConfigurator(QDialog):
     def __init__(self, folder):
         super().__init__()
         self.setWindowTitle('Runner configurator')
-        uic.loadUi('components/runner_configurator/runner_configurator.ui', self)
+        f = io.StringIO(template)
+        # uic.loadUi('components/runner_configurator/runner_configurator.ui', self)
+        uic.loadUi(f, self)
 
         self.runner_file = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Documents', 'CodeMaster', 'runners.json')
         
