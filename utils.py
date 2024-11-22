@@ -20,13 +20,20 @@ def initData():
         if not os.path.exists(runners_file):
             conn = sqlite3.connect(runners_file)
             cur = conn.cursor()
-            query = """CREATE TABLE runners 
+            query_runners = """CREATE TABLE runners 
                         (
                         ext VARCHAR(255),
                         runner VARCHAR(255)
                         );
             """
-            cur.execute(query)
+            query_logs = """CREATE TABLE logs 
+                        (
+                        message VARCHAR(255),
+                        datetime VARCHAR(255)
+                        );
+            """
+            cur.execute(query_runners)
+            cur.execute(query_logs)
             conn.commit()
             conn.close()
             
@@ -82,7 +89,10 @@ def get_tree_items(path, self):
         if parent_name in dirs and not folder_name == parent_name:
             dirs[parent_name].insertRow(0, folder)
 
-    first_dir = list(dirs.values())[0]
-    rootNode.appendRow(first_dir)
+    if len(list(dirs.values())):
+        first_dir = list(dirs.values())[0]
+        rootNode.appendRow(first_dir)
 
-    return treeModel
+        return treeModel
+
+    return None

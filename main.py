@@ -3,14 +3,14 @@ import sys
 from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from components.runner_configurator.configurator import RunnerConfigurator
-from db import getRunners
+from db import addLog, getRunners
 from models.file import File
 from PyQt6.QtGui import QIcon
 from initions import initActions, initShortcuts, initTheme
 import subprocess
 from interface import templete
 from utils import get_tree_items, getMemoryData, initData, setMemoryData
-
+import datetime
 
 class CodeMaster(QMainWindow):
     def __init__(self):
@@ -21,6 +21,7 @@ class CodeMaster(QMainWindow):
         initShortcuts(self)
         initTheme(self)
         initData()
+        addLog('Program is started', datetime.datetime.now().strftime("%d.%m.%Y-%H:%M"))
         self.files = []
         self.horSplitter.setStretchFactor(1, 10)
         self.vertSplitter.setStretchFactor(9, 1)
@@ -29,7 +30,7 @@ class CodeMaster(QMainWindow):
         memoryData = getMemoryData()
         if memoryData:
             for path in memoryData['openedFiles']:
-                self.openFile(path)
+                self.openFile(path.replace('\\', '/'))
 
             if memoryData['openedFolder']:
                 self.openFolder(memoryData['openedFolder'])
@@ -87,7 +88,7 @@ class CodeMaster(QMainWindow):
             file.save()
 
     def closeFile(self, index=None):
-        if not index: index = self.tabWidget.currentIndex()
+        if index == None: index = self.tabWidget.currentIndex()
         if not index == -1:
             self.files[index].save()
             self.tabWidget.removeTab(index)
@@ -99,11 +100,16 @@ class CodeMaster(QMainWindow):
         item = self.treeModel.itemFromIndex(index)
         path = item.path
         if path:
-            with open(path, 'r', encoding='UTF-8') as f:
-                content = f.read()
-                file = File(path.split('\\')[-1], path, content, ctx=self)
-                self.files.append(file) 
-                self.addTab(file.textEdit, file.name)
+            try:
+                with open(path, 'r', encoding='UTF-8') as f:
+                    content = f.read()
+                    file = File(path.split('\\')[-1], path, content, ctx=self)
+                    self.files.append(file) 
+                    self.addTab(file.textEdit, file.name)
+            except UnicodeDecodeError:
+                QMessageBox.information(self, 'Неподдерживаемый формат файла', 'Такой формат файла не поддерживается')
+            except FileNotFoundError:
+                pass
 
         self.updateOpenedFiles()
 
@@ -115,11 +121,16 @@ class CodeMaster(QMainWindow):
 
         if pathes[1]:
             for path in pathes[0]:
-                with open(path, 'r', encoding='UTF-8') as f:
-                    content = f.read()
-                    file = File(path.split('/')[-1], path, content, ctx=self)
-                    self.files.append(file)
-                    self.addTab(file.textEdit, file.name)
+                try:
+                    with open(path, 'r', encoding='UTF-8') as f:
+                        content = f.read()
+                        file = File(path.split('/')[-1], path, content, ctx=self)
+                        self.files.append(file)
+                        self.addTab(file.textEdit, file.name)
+                except UnicodeDecodeError:
+                    QMessageBox.information(self, 'Неподдерживаемый формат файла', 'Такой формат файла не поддерживается')
+                except FileNotFoundError:
+                    pass
 
 
         self.updateOpenedFiles()
@@ -130,9 +141,10 @@ class CodeMaster(QMainWindow):
         if path:
             self.folder = path
             treeModel = get_tree_items(path, self)
-            self.treeModel = treeModel
-            self.treeView.setModel(treeModel)
-            setMemoryData('openedFolder', path)
+            if treeModel:
+                self.treeModel = treeModel
+                self.treeView.setModel(treeModel)
+                setMemoryData('openedFolder', path)
 
 
     def addTab(self, content, title):
@@ -149,6 +161,9 @@ class CodeMaster(QMainWindow):
         msg.setWindowTitle("О программе")
         msg.setText("CodeMaster - это простой редактор кода\nАвтор: MatveySuvorov")
         msg.exec()
+
+    def closeEvent(self, event):
+        addLog('Program is stopped', datetime.datetime.now().strftime("%d.%m.%Y-%H:%M"))
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

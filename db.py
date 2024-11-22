@@ -41,3 +41,10 @@ def deleteRunner(ext, runner):
     cur.execute(f"DELETE FROM runners WHERE ext='{ext}' AND runner='{runner}'")
     conn.commit()
     conn.close()
+
+def addLog(messsage, datetime):
+    conn = sqlite3.connect(runners_path)
+    cur = conn.cursor() 
+    cur.execute("INSERT INTO logs (message, datetime) VALUES (?, ?)", [messsage, datetime])
+    conn.commit()
+    conn.close()
